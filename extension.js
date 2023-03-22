@@ -64,15 +64,37 @@ class AppList extends PanelMenu.Button {
     this.menu.removeAll();
   }
 
+  getSettings() {
+    let GioSSS = Gio.SettingsSchemaSource;
+    let schemaSource = GioSSS.new_from_directory(
+      Me.dir.get_child("schemas").get_path(),
+      GioSSS.get_default(),
+      false
+    );
+    let schemaObj = schemaSource.lookup('org.gnome.desktop.wm.preferences', true);
+    if (!schemaObj) {
+      throw new Error('cannot find schemas');
+    }
+    return new Gio.Settings({ settings_schema : schemaObj });
+  }
+
   addWindows() {
-    var j, len1, ref1, results, apps, icon, wsitem;
+    var j, len1, ref1, results, apps, icon, wsitem, label1;
+
+    let settings = this.getSettings();
+    let arr = settings.get_strv('workspace-names');
 
     // Get number of workspaces
     let workspaceManager = global.workspace_manager;
     this._currentWorkspace = workspaceManager.get_active_workspace_index();
     for (let i = 0; i < workspaceManager.n_workspaces; i++) {
+      label1 = "Workspace " + (i+1);
+      if (arr[i]!="") {
+        label1 = arr[i] + " (Workspace " + (i+1) + ")";
+      }
       wsitem = new PopupMenu.PopupMenuSection();
-      wsitem.actor.add_child( new PopupMenu.PopupMenuItem('Workspace ' + (i+1), { style_class: 'my-menu-section' }));
+      wsitem.actor.add_child( new PopupMenu.PopupMenuItem(label1, { style_class: 'my-menu-section' }));
+
       this.menu.addMenuItem(wsitem);
       // Get all running apps on this workspace
       ref1 = global.display.get_tab_list(Meta.TabList.NORMAL_ALL, null);

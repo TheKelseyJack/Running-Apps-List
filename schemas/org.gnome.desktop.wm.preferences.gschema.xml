@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+
+  <schema id="org.gnome.desktop.wm.preferences"
+    path="/org/gnome/desktop/wm/preferences/">
+
+    <key type="as" name="workspace-names">
+      <default>[]</default>
+      <summary>The names of the workspaces</summary>
+      <description>Defines the names that should be assigned to workspaces. If the list is too long for the current number of workspaces, names in excess will be ignored. If the list is too short, or includes empty names, missing values will be replaced with the default (“Workspace N”).</description>
+    </key>
+
+  </schema>
+
+</schemalist>
+
+

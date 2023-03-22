@@ -4,6 +4,6 @@
     "description": "List of all running apps from a single panel icon. A basic replacement for Window List, taking up less space and similar to the applet in Gnome Legacy.",
     "shell-version": [ "42", "43" ],
     "url": "https://github.com/TheKelseyJack/Running-Apps-List",
-    "version": 1
+    "version": 2
 }
 
