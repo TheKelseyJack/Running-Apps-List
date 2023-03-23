@@ -14,6 +14,7 @@ Features to be added
 
 * A right click menu on an app, with options to goto the app or close the app.
 
+* Drag and drop windows to different workspaces
 
-
+* Icon on workspace lines to switch to different workspaces
 
