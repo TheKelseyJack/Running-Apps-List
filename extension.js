@@ -64,24 +64,10 @@ class AppList extends PanelMenu.Button {
     this.menu.removeAll();
   }
 
-  getSettings() {
-    let GioSSS = Gio.SettingsSchemaSource;
-    let schemaSource = GioSSS.new_from_directory(
-      Me.dir.get_child("schemas").get_path(),
-      GioSSS.get_default(),
-      false
-    );
-    let schemaObj = schemaSource.lookup('org.gnome.desktop.wm.preferences', true);
-    if (!schemaObj) {
-      throw new Error('cannot find schemas');
-    }
-    return new Gio.Settings({ settings_schema : schemaObj });
-  }
-
   addWindows() {
     var j, len1, ref1, results, apps, icon, wsitem, label1;
 
-    let settings = this.getSettings();
+    let settings = ExtensionUtils.getSettings("org.gnome.desktop.wm.preferences");
     let arr = settings.get_strv('workspace-names');
 
     // Get number of workspaces
@@ -92,6 +78,7 @@ class AppList extends PanelMenu.Button {
       if (arr[i]!="") {
         label1 = arr[i] + " (Workspace " + (i+1) + ")";
       }
+
       wsitem = new PopupMenu.PopupMenuSection();
       wsitem.actor.add_child( new PopupMenu.PopupMenuItem(label1, { style_class: 'my-menu-section' }));
 
