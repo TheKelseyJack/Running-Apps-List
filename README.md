@@ -5,16 +5,17 @@ This is a simple Gnome Extension developed to recreate the Window List Menu appl
 
 Version 2 added workspace names if they are defined in the desktop settings.
 
+Version 4 cleaned up the panel layout and added extra feedback like identying the current workspace, scrollbars when the window list gets too long and workspace switcher buttons to all windows listed.
+
 Features to be added
 ====================
 
-* Use the desktop signature color for the workspace section headers.
+* Use the desktop signature color for the workspace section headers (waiting for libadwaita).
 
-* Option to move selected window to the current workspace, instead of switching to the apps workspace.
+* Drag and drop windows to different workspaces. Added workspace switcher arrows instead, but could add drag and drop in the future.
 
-* A right click menu on an app, with options to goto the app or close the app.
-
-* Drag and drop windows to different workspaces
-
-* Icon on workspace lines to switch to different workspaces
+* Settings menu to ...
+  * Change width and height of popup window
+  * Change workspace header color
+  * Hide workspace switcher buttons
 
