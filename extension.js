@@ -22,6 +22,7 @@
  *        Added a scrollbar to the popup in case the list goes off the bottom of the screen
  *        Made the popup wider to identify windows with long similar names
  *        Added workspace switcher buttons to each window in the list
+ *  v5	- Fix to close popup once window selected
  **/
 
 const Clutter   = imports.gi.Clutter;
@@ -43,7 +44,7 @@ const RunningAppList = GObject.registerClass(
 class RunningAppList extends PanelMenu.Button {
 
   _init() {
-    super._init(St.Align.START, "AppList");
+    super._init(St.Align.START, "RunningAppList");
 
     // Add icon to panel
     let icon = new St.Icon({
@@ -187,6 +188,8 @@ class RunningAppList extends PanelMenu.Button {
         if (wswindow.minimized) wswindow.unminimize();
         // Raise window so it is above all other windows
         wswindow.raise();
+        // Close popup once switched to window
+        this.menu.close();
       });
     }
 
