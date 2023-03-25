@@ -1,17 +1,28 @@
 .my-menu-section {
-    font-weight: bold;
-    color: #ffffff;
     background-color: rgba(10,10,100,0.7);
     border-radius: 6px;
-    font-size:1.2em;
-    padding:.2em;
-    width:480px;
+    font-size: 1.2em;
+    padding: 0.2em;
+    width: 480px;
+}
+
+.my-section-title {
+    font-weight: bold;
+    font-size: 1.2em;
+    padding: 0.2em;
+    margin-right: 32px;
 }
 
 .my-menu-item {
-    font-size:1.0em;
-    width:480px;
-    padding:0.2em;
+    font-size: 1.0em;
+    width: 480px;
+    padding: 0.2em;
+    margin-right: 32px;
+}
+
+.ci-workspace-menu-section {
+    max-height: 640px;
+    width: 650px;
 }
 
 
