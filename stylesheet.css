@@ -1,28 +1,32 @@
-.my-menu-section {
+.ral-menu-section {
     background-color: rgba(10,10,100,0.7);
-    border-radius: 6px;
+    border-radius: 4px;
     font-size: 1.2em;
     padding: 0.2em;
     width: 480px;
 }
 
-.my-section-title {
+.ral-section-title {
     font-weight: bold;
     font-size: 1.2em;
     padding: 0.2em;
     margin-right: 32px;
 }
 
-.my-menu-item {
+.ral-menu-item {
     font-size: 1.0em;
     width: 480px;
-    padding: 0.2em;
+    padding: 0.2em,;
     margin-right: 32px;
 }
 
-.ci-workspace-menu-section {
+.ral-workspace-menu-section {
     max-height: 640px;
     width: 650px;
+}
+
+.popup-menu-item .ral-action-btn StIcon {
+    icon-size:16px;
 }
 
 

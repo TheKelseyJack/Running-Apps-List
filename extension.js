@@ -23,13 +23,14 @@
  *        Made the popup wider to identify windows with long similar names
  *        Added workspace switcher buttons to each window in the list
  *  v5	- Fix to close popup once window selected
+ *  v6	- Removed Lang module
+ *        Cleaned up CSS so names match stylesheet
+ *        Added schema for future use
  **/
 
 const Clutter   = imports.gi.Clutter;
 const Gio       = imports.gi.Gio;
 const GObject   = imports.gi.GObject;
-const Lang      = imports.lang;
-const Gtk       = imports.gi.Gtk;
 const St        = imports.gi.St;
 const Meta      = imports.gi.Meta;
 const Shell     = imports.gi.Shell;
@@ -54,7 +55,7 @@ class RunningAppList extends PanelMenu.Button {
     this.add_child(icon);
 
     this.addWindows();
- 
+
     this.menu.connect('open-state-changed', (menu, open) => {
       if (open) this.refresh();
     });
@@ -81,7 +82,7 @@ class RunningAppList extends PanelMenu.Button {
     this.workspaceSection = new PopupMenu.PopupMenuSection();
     this.scrollViewWorkspaceMenuSection = new PopupMenu.PopupMenuSection();
     let workspaceScrollView = new St.ScrollView({
-      style_class: 'ci-workspace-menu-section',
+      style_class: 'ral-workspace-menu-section',
       overlay_scrollbars: true
     });
     workspaceScrollView.add_actor(this.workspaceSection.actor);
@@ -90,8 +91,8 @@ class RunningAppList extends PanelMenu.Button {
     this.menu.addMenuItem(this.scrollViewWorkspaceMenuSection);
 
     // Read list of workspace names
-    let settings = ExtensionUtils.getSettings("org.gnome.desktop.wm.preferences");
-    this.workspaceNames = settings.get_strv('workspace-names');
+    let desktopSettings = ExtensionUtils.getSettings("org.gnome.desktop.wm.preferences");
+    this.workspaceNames = desktopSettings.get_strv('workspace-names');
 
     // Get number of workspaces
     let workspaceManager = global.workspace_manager;
@@ -123,10 +124,10 @@ class RunningAppList extends PanelMenu.Button {
       label1 = label1 + " (" + this.workspaceNames[i] + ")";
     }
 
-    let menuItem = new PopupMenu.PopupMenuItem("", { style_class: 'my-menu-section' });
+    let menuItem = new PopupMenu.PopupMenuItem("", { style_class: 'ral-menu-section' });
 
     let lLabel = new St.Label({
-      style_class: 'my-section-title',
+      style_class: 'ral-section-title',
       text: label1,
       x_align: Clutter.ActorAlign.START,
       x_expand: false,
@@ -136,7 +137,7 @@ class RunningAppList extends PanelMenu.Button {
 
     if (this._currentWorkspace == i) {
       let rLabel = new St.Label({
-        style_class: 'my-section-title',
+        style_class: 'ral-section-title',
         text: "CURRENT",
         x_align: Clutter.ActorAlign.END,
         x_expand: true,
@@ -150,7 +151,7 @@ class RunningAppList extends PanelMenu.Button {
 
   addItem(data, wswindow) {
     var fname, upBtn, downBtn;
-    let menuItem = new PopupMenu.PopupImageMenuItem(data.name, data.icon, { style_class: 'my-menu-item' });;
+    let menuItem = new PopupMenu.PopupImageMenuItem(data.name, data.icon, { style_class: 'ral-menu-item' });;
 
     let wsNum = wswindow.get_workspace().index();
 
@@ -158,12 +159,10 @@ class RunningAppList extends PanelMenu.Button {
       downBtn = this.addIcon('goa-account-symbolic', true);
     }else {
       downBtn = this.addIcon('pan-down-symbolic', true);
-      downBtn.connect('clicked',
-        Lang.bind(this, function () {
-          wswindow.change_workspace_by_index(data.workspace + 1, false);
-          this.refresh();
-        })
-      );
+      downBtn.connect('clicked', () => {
+        wswindow.change_workspace_by_index(data.workspace + 1, false);
+        this.refresh();
+      });
     }
     menuItem.actor.add_child(downBtn);
 
@@ -171,12 +170,10 @@ class RunningAppList extends PanelMenu.Button {
       upBtn = this.addIcon('goa-account-symbolic', false);
     }else {
       upBtn = this.addIcon('pan-up-symbolic', false);
-      upBtn.connect('clicked',
-        Lang.bind(this, function () {
-          wswindow.change_workspace_by_index(data.workspace - 1, false);
-          this.refresh();
-        })
-      );
+      upBtn.connect('clicked', () => {
+        wswindow.change_workspace_by_index(data.workspace - 1, false);
+        this.refresh();
+      });
     }
     menuItem.actor.add_child(upBtn);
 
@@ -203,7 +200,7 @@ class RunningAppList extends PanelMenu.Button {
     });
 
     let icoBtn = new St.Button({
-      style_class: 'ci-action-btn',
+      style_class: 'ral-action-btn',
       can_focus: true,
       child: icon,
       x_align: Clutter.ActorAlign.END,
