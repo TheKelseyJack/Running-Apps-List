@@ -4,32 +4,32 @@
   <schema id="org.gnome.shell.extensions.running-apps"
        path="/org/gnome/shell/extensions/running-apps/">
 
-    <key name="show-workspace-change-buttons" type="b">
-      <default>true</default>
-      <summary>Show workspace change arrow buttons</summary>
-    </key>
-
-    <key name="list-width" type="i">
+    <key type="i" name="list-width">
       <default>450</default>
       <summary>Width of the list</summary>
       <description>Set the width of the list.</description>
       <range min="240" max="800" />
     </key>
 
-    <key name="list-height" type="i">
+    <key type="i" name="list-height">
       <default>600</default>
       <summary>Height of the list</summary>
       <description>Set the maximum height of the list before scrollbars appear.</description>
       <range min="240" max="800" />
     </key>
 
-    <key name="workspace-header-color" type="s">
+    <key type="b" name="show-workspace-change-buttons">
+      <default>true</default>
+      <summary>Show workspace change buttons</summary>
+      <description>Show the buttons used to move a window to the next or previous workspace.</description>
+    </key>
+
+    <key type="s" name="workspace-header-color">
       <default>"rgba(10,10,100,0)"</default>
       <summary>Workspace header color</summary>
       <description>Set the workspace header color.</description>
     </key>
 
   </schema>
-
 </schemalist>
 

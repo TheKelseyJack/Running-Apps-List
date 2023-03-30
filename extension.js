@@ -23,9 +23,11 @@
  *        Made the popup wider to identify windows with long similar names
  *        Added workspace switcher buttons to each window in the list
  *  v5	- Fix to close popup once window selected
- *  v6	- Removed Lang module
+ *  v7	- Removed Lang module
  *        Cleaned up CSS so names match stylesheet
- *        Added schema for future use
+ *  v8  - Fixed bug with workspace names when list is empty
+ *        Added preferences to change size, color and hide buttons
+ *
  **/
 
 const Clutter   = imports.gi.Clutter;
@@ -37,9 +39,15 @@ const Shell     = imports.gi.Shell;
 const Main      = imports.ui.main;
 const PanelMenu = imports.ui.panelMenu;
 const PopupMenu = imports.ui.popupMenu;
+const Gettext   = imports.gettext;
 
 const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
+
+const Domain = Gettext.domain(Me.metadata.uuid);
+
+const _ = Domain.gettext;
+const ngettext = Domain.ngettext;
 
 const RunningAppList = GObject.registerClass(
 class RunningAppList extends PanelMenu.Button {
@@ -83,7 +91,9 @@ class RunningAppList extends PanelMenu.Button {
     this.scrollViewWorkspaceMenuSection = new PopupMenu.PopupMenuSection();
     let workspaceScrollView = new St.ScrollView({
       style_class: 'ral-workspace-menu-section',
-      overlay_scrollbars: true
+      overlay_scrollbars: true,
+      hscrollbar_policy: St.PolicyType.NEVER,
+      vscrollbar_policy: St.PolicyType.AUTOMATIC
     });
     workspaceScrollView.add_actor(this.workspaceSection.actor);
 
@@ -91,8 +101,12 @@ class RunningAppList extends PanelMenu.Button {
     this.menu.addMenuItem(this.scrollViewWorkspaceMenuSection);
 
     // Read list of workspace names
-    let desktopSettings = ExtensionUtils.getSettings("org.gnome.desktop.wm.preferences");
+    let desktopSettings = new Gio.Settings({schema: 'org.gnome.desktop.wm.preferences'});
     this.workspaceNames = desktopSettings.get_strv('workspace-names');
+
+    let extSettings = new Gio.Settings({schema: 'org.gnome.shell.extensions.running-apps'});
+    //workspaceScrollView.set_style("width: " + extSettings.get_int('list-width') + "px");
+    workspaceScrollView.set_style("max-height: " + extSettings.get_int('list-height') + "px");
 
     // Get number of workspaces
     let workspaceManager = global.workspace_manager;
@@ -119,12 +133,15 @@ class RunningAppList extends PanelMenu.Button {
   }
 
   addSection(i) {
-    let label1 = "Workspace " + (i+1);
-    if (this.workspaceNames[i]!="") {
+    let label1 = _("Workspace") + " " + (i+1);
+    if ((this.workspaceNames.length > i) && (this.workspaceNames[i]!="")) {
       label1 = label1 + " (" + this.workspaceNames[i] + ")";
     }
 
     let menuItem = new PopupMenu.PopupMenuItem("", { style_class: 'ral-menu-section' });
+
+    let extSettings = new Gio.Settings({schema: 'org.gnome.shell.extensions.running-apps'});
+    menuItem.set_style("background-color: " + extSettings.get_string('workspace-header-color') + "; width: " + extSettings.get_int('list-width') + "px;");
 
     let lLabel = new St.Label({
       style_class: 'ral-section-title',
@@ -138,7 +155,7 @@ class RunningAppList extends PanelMenu.Button {
     if (this._currentWorkspace == i) {
       let rLabel = new St.Label({
         style_class: 'ral-section-title',
-        text: "CURRENT",
+        text: _("CURRENT"),
         x_align: Clutter.ActorAlign.END,
         x_expand: true,
         y_expand: true
@@ -153,29 +170,34 @@ class RunningAppList extends PanelMenu.Button {
     var fname, upBtn, downBtn;
     let menuItem = new PopupMenu.PopupImageMenuItem(data.name, data.icon, { style_class: 'ral-menu-item' });;
 
-    let wsNum = wswindow.get_workspace().index();
+    let extSettings = new Gio.Settings({schema: 'org.gnome.shell.extensions.running-apps'});
+    menuItem.set_style("width: " + extSettings.get_int('list-width') + "px");
+    if (extSettings.get_boolean('show-workspace-change-buttons') == true) {
 
-    if (wsNum + 1 == data.numWorkspaces) {
-      downBtn = this.addIcon('goa-account-symbolic', true);
-    }else {
-      downBtn = this.addIcon('pan-down-symbolic', true);
-      downBtn.connect('clicked', () => {
-        wswindow.change_workspace_by_index(data.workspace + 1, false);
-        this.refresh();
-      });
-    }
-    menuItem.actor.add_child(downBtn);
+      let wsNum = wswindow.get_workspace().index();
 
-    if (wsNum == 0) {
-      upBtn = this.addIcon('goa-account-symbolic', false);
-    }else {
-      upBtn = this.addIcon('pan-up-symbolic', false);
-      upBtn.connect('clicked', () => {
-        wswindow.change_workspace_by_index(data.workspace - 1, false);
-        this.refresh();
-      });
+      if (wsNum + 1 == data.numWorkspaces) {
+        downBtn = this.addIcon('goa-account-symbolic', true);
+      }else {
+        downBtn = this.addIcon('pan-down-symbolic', true);
+        downBtn.connect('clicked', () => {
+          wswindow.change_workspace_by_index(data.workspace + 1, false);
+          this.refresh();
+        });
+      }
+      menuItem.actor.add_child(downBtn);
+
+      if (wsNum == 0) {
+        upBtn = this.addIcon('goa-account-symbolic', false);
+      }else {
+        upBtn = this.addIcon('pan-up-symbolic', false);
+        upBtn.connect('clicked', () => {
+          wswindow.change_workspace_by_index(data.workspace - 1, false);
+          this.refresh();
+        });
+      }
+      menuItem.actor.add_child(upBtn);
     }
-    menuItem.actor.add_child(upBtn);
 
     if (wswindow) {
       menuItem.connect('activate', () => {
@@ -222,6 +244,8 @@ class RunningAppList extends PanelMenu.Button {
 let runningAppList;
 
 function init() {
+  ExtensionUtils.initTranslations(Me.metadata.uuid);
+  return new Extension();
 }
 
 function enable() {
