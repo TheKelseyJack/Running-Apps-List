@@ -55,6 +55,8 @@ class RunningAppList extends PanelMenu.Button {
   _init() {
     super._init(St.Align.START, "RunningAppList");
 
+    this.extSettings = new ExtensionUtils.getSettings('org.gnome.shell.extensions.running-apps');
+
     // Add icon to panel
     let icon = new St.Icon({
       gicon: Gio.icon_new_for_string(Me.dir.get_path() + '/blue.png'),
@@ -104,9 +106,7 @@ class RunningAppList extends PanelMenu.Button {
     let desktopSettings = new Gio.Settings({schema: 'org.gnome.desktop.wm.preferences'});
     this.workspaceNames = desktopSettings.get_strv('workspace-names');
 
-    let extSettings = new Gio.Settings({schema: 'org.gnome.shell.extensions.running-apps'});
-    //workspaceScrollView.set_style("width: " + extSettings.get_int('list-width') + "px");
-    workspaceScrollView.set_style("max-height: " + extSettings.get_int('list-height') + "px");
+    workspaceScrollView.set_style("max-height: " + this.extSettings.get_int('list-height') + "px");
 
     // Get number of workspaces
     let workspaceManager = global.workspace_manager;
@@ -140,8 +140,7 @@ class RunningAppList extends PanelMenu.Button {
 
     let menuItem = new PopupMenu.PopupMenuItem("", { style_class: 'ral-menu-section' });
 
-    let extSettings = new Gio.Settings({schema: 'org.gnome.shell.extensions.running-apps'});
-    menuItem.set_style("background-color: " + extSettings.get_string('workspace-header-color') + "; width: " + extSettings.get_int('list-width') + "px;");
+    menuItem.set_style("background-color: " + this.extSettings.get_string('workspace-header-color') + "; width: " + this.extSettings.get_int('list-width') + "px;");
 
     let lLabel = new St.Label({
       style_class: 'ral-section-title',
@@ -170,9 +169,8 @@ class RunningAppList extends PanelMenu.Button {
     var fname, upBtn, downBtn;
     let menuItem = new PopupMenu.PopupImageMenuItem(data.name, data.icon, { style_class: 'ral-menu-item' });;
 
-    let extSettings = new Gio.Settings({schema: 'org.gnome.shell.extensions.running-apps'});
-    menuItem.set_style("width: " + extSettings.get_int('list-width') + "px");
-    if (extSettings.get_boolean('show-workspace-change-buttons') == true) {
+    menuItem.set_style("width: " + this.extSettings.get_int('list-width') + "px");
+    if (this.extSettings.get_boolean('show-workspace-change-buttons') == true) {
 
       let wsNum = wswindow.get_workspace().index();
 
@@ -245,7 +243,6 @@ let runningAppList;
 
 function init() {
   ExtensionUtils.initTranslations(Me.metadata.uuid);
-  return new Extension();
 }
 
 function enable() {

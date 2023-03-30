@@ -15,7 +15,7 @@ function init() {
 }
 
 function fillPreferencesWindow(window) {
-    let settings = new Gio.Settings({schema: 'org.gnome.shell.extensions.running-apps'});
+    let settings = new ExtensionUtils.getSettings('org.gnome.shell.extensions.running-apps');
 
     const page = new Adw.PreferencesPage();
 
