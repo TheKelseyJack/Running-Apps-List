@@ -7,6 +7,8 @@ Version 2 added workspace names if they are defined in the desktop settings.
 
 Version 4 cleaned up the panel layout and added extra feedback like identying the current workspace, scrollbars when the window list gets too long and workspace switcher buttons to all windows listed.
 
+Version 10 added preferences to alter basic style and functionality
+
 Features to be added
 ====================
 
@@ -14,8 +16,4 @@ Features to be added
 
 * Drag and drop windows to different workspaces. Added workspace switcher arrows instead, but could add drag and drop in the future.
 
-* Settings menu to ...
-  * Change width and height of popup window
-  * Change workspace header color
-  * Hide workspace switcher buttons
 
