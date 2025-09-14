@@ -9,11 +9,7 @@ Version 4 cleaned up the panel layout and added extra feedback like identying th
 
 Version 10 added preferences to alter basic style and functionality
 
-Features to be added
-====================
+Version 12 ports the code to Gnome 46 (Ubuntu 24.04 LTS)
 
-* Use the desktop signature color for the workspace section headers (waiting for libadwaita).
-
-* Drag and drop windows to different workspaces. Added workspace switcher arrows instead, but could add drag and drop in the future.
 
 

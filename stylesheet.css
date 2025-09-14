@@ -1,18 +1,18 @@
 
 .ral-menu-section {
-    font-weight: bold;
-    border-radius: 6px;
-    padding: 4px 4px 2px 2px;
-    font-size:1.2em;
+  font-weight: bold;
+  border-radius: 6px;
+  padding: 4px 4px 2px 2px;
+  font-size:1.2em;
 }
 
 .ral-section-title {
-    font-weight: bold;
+  font-weight: bold;
 }
 
 .ral-menu-item {
-    font-size:1.0em;
-    padding: 0.2em 4px 0.2em 2px;
+  font-size:1.0em;
+  padding: 0.2em 4px 0.2em 2px;
 }
 
 .ral-app-icon {
