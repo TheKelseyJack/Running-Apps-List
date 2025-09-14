@@ -25,7 +25,7 @@
     </key>
 
     <key type="s" name="workspace-header-color">
-      <default>"rgba(10,10,100,0)"</default>
+      <default>"rgb(191,64,64)"</default>
       <summary>Workspace header color</summary>
       <description>Set the workspace header color.</description>
     </key>

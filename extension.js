@@ -25,51 +25,45 @@
  *  v5	- Fix to close popup once window selected
  *  v7	- Removed Lang module
  *        Cleaned up CSS so names match stylesheet
- *  v8  - Fixed bug with workspace names when list is empty
+ *  v10  - Fixed bug with workspace names when list is empty
  *        Added preferences to change size, color and hide buttons
  *
+ *  v11 - Port to Gnome 46
+ *        Replaced the panel icon to match style of other extensions
  **/
 
-const Clutter   = imports.gi.Clutter;
-const Gio       = imports.gi.Gio;
-const GObject   = imports.gi.GObject;
-const St        = imports.gi.St;
-const Meta      = imports.gi.Meta;
-const Shell     = imports.gi.Shell;
-const Main      = imports.ui.main;
-const PanelMenu = imports.ui.panelMenu;
-const PopupMenu = imports.ui.popupMenu;
-const Gettext   = imports.gettext;
+import Clutter from "gi://Clutter";
+import Gio from 'gi://Gio';
+import GObject from 'gi://GObject';
+import St from 'gi://St';
+import Meta from 'gi://Meta';
+import Shell from "gi://Shell";
 
-const ExtensionUtils = imports.misc.extensionUtils;
-const Me = ExtensionUtils.getCurrentExtension();
+import {Extension, gettext as _} from 'resource:///org/gnome/shell/extensions/extension.js';
+import * as PanelMenu from 'resource:///org/gnome/shell/ui/panelMenu.js';
+import * as PopupMenu from 'resource:///org/gnome/shell/ui/popupMenu.js';
 
-const Domain = Gettext.domain(Me.metadata.uuid);
+import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 
-const _ = Domain.gettext;
-const ngettext = Domain.ngettext;
+const RunningAppList  = GObject.registerClass(
+  class RunningAppList  extends PanelMenu.Button {
+    _init({ settings, path }) {
+      super._init(0.0, "RunningAppList");
 
-const RunningAppList = GObject.registerClass(
-class RunningAppList extends PanelMenu.Button {
+      this._settings = settings;
+      this._path = path;
 
-  _init() {
-    super._init(St.Align.START, "RunningAppList");
+      this.add_child(new St.Icon({
+        gicon: Gio.icon_new_for_string(this._path + "/icon.png"),
+        style_class: 'system-status-icon'
+      }));
 
-    this.extSettings = new ExtensionUtils.getSettings('org.gnome.shell.extensions.running-apps');
-
-    // Add icon to panel
-    let icon = new St.Icon({
-      gicon: Gio.icon_new_for_string(Me.dir.get_path() + '/blue.png'),
-      style_class: 'system-status-icon'
-    });
-    this.add_child(icon);
-
-    this.addWindows();
-
-    this.menu.connect('open-state-changed', (menu, open) => {
-      if (open) this.refresh();
-    });
-  }
+      this.addWindows();
+ 
+      this.menu.connect('open-state-changed', (menu, open) => {
+        if (open) this.refresh();
+      });
+    }
 
   destroy() {
     this.clearWindows();
@@ -88,25 +82,25 @@ class RunningAppList extends PanelMenu.Button {
   addWindows() {
     var numWindows, appWindows;
 
-    // Setup a scroll view in case there are so many windows open the list goes off the screen
-    this.workspaceSection = new PopupMenu.PopupMenuSection();
     this.scrollViewWorkspaceMenuSection = new PopupMenu.PopupMenuSection();
+    this.menu.addMenuItem(this.scrollViewWorkspaceMenuSection);
+
     let workspaceScrollView = new St.ScrollView({
-      style_class: 'ral-workspace-menu-section',
-      overlay_scrollbars: true,
+      style_class: 'ral-menu-section',
+      overlay_scrollbars: false,
       hscrollbar_policy: St.PolicyType.NEVER,
       vscrollbar_policy: St.PolicyType.AUTOMATIC
     });
-    workspaceScrollView.add_actor(this.workspaceSection.actor);
+    this.scrollViewWorkspaceMenuSection.actor.add_child(workspaceScrollView);
 
-    this.scrollViewWorkspaceMenuSection.actor.add_actor(workspaceScrollView);
-    this.menu.addMenuItem(this.scrollViewWorkspaceMenuSection);
+    this.workspaceSection = new PopupMenu.PopupMenuSection();
+    workspaceScrollView.add_child(this.workspaceSection.actor);
+
+    workspaceScrollView.set_style("max-height: " + this._settings.get_int('list-height') + "px");
 
     // Read list of workspace names
     let desktopSettings = new Gio.Settings({schema: 'org.gnome.desktop.wm.preferences'});
     this.workspaceNames = desktopSettings.get_strv('workspace-names');
-
-    workspaceScrollView.set_style("max-height: " + this.extSettings.get_int('list-height') + "px");
 
     // Get number of workspaces
     let workspaceManager = global.workspace_manager;
@@ -140,7 +134,7 @@ class RunningAppList extends PanelMenu.Button {
 
     let menuItem = new PopupMenu.PopupMenuItem("", { style_class: 'ral-menu-section' });
 
-    menuItem.set_style("background-color: " + this.extSettings.get_string('workspace-header-color') + "; width: " + this.extSettings.get_int('list-width') + "px;");
+    menuItem.set_style("background-color: " + this._settings.get_string('workspace-header-color') + "; width: " + this._settings.get_int('list-width') + "px;");
 
     let lLabel = new St.Label({
       style_class: 'ral-section-title',
@@ -169,8 +163,9 @@ class RunningAppList extends PanelMenu.Button {
     var fname, upBtn, downBtn;
     let menuItem = new PopupMenu.PopupImageMenuItem(data.name, data.icon, { style_class: 'ral-menu-item' });;
 
-    menuItem.set_style("width: " + this.extSettings.get_int('list-width') + "px");
-    if (this.extSettings.get_boolean('show-workspace-change-buttons') == true) {
+    menuItem.set_style("width: " + this._settings.get_int('list-width') + "px");
+
+    if (this._settings.get_boolean('show-workspace-change-buttons') == true) {
 
       let wsNum = wswindow.get_workspace().index();
 
@@ -209,14 +204,13 @@ class RunningAppList extends PanelMenu.Button {
         this.menu.close();
       });
     }
-
     this.workspaceSection.addMenuItem(menuItem);
   }
 
   addIcon(icon_name, expand) {
     let icon = new St.Icon({
       icon_name: icon_name,
-      style_class: 'system-status-icon'
+      style_class: 'ral-app-icon'
     });
 
     let icoBtn = new St.Button({
@@ -232,26 +226,23 @@ class RunningAppList extends PanelMenu.Button {
   }
 
   addSeparator() {
-    this.workspaceSection.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
+    this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
   }
 
-})
+});
 
-// Don't touch below as all functionality is now in the class
+export default class RunningAppListExtension extends Extension {
+    enable() {
+        this._settings = this.getSettings();
+        this._indicator = new RunningAppList({
+            settings: this._settings,
+            path: this.path
+        });
+        Main.panel.addToStatusArea(this.uuid, this._indicator);
+    }
 
-let runningAppList;
-
-function init() {
-  ExtensionUtils.initTranslations(Me.metadata.uuid);
+    disable() {
+        this._indicator.destroy();
+        this._indicator = null;
+    }
 }
-
-function enable() {
-  runningAppList = new RunningAppList();
-  Main.panel.addToStatusArea('runningAppList', runningAppList, 1);
-}
-
-function disable() {
-  runningAppList.destroy();
-  runningAppList = null;
-}
-

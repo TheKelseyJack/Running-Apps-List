@@ -1,31 +1,26 @@
+
 .ral-menu-section {
-    background-color: rgba(10,10,100,0.7);
-    border-radius: 4px;
-    font-size: 1.2em;
-    padding: 0.2em;
-    width: 480px;
+    font-weight: bold;
+    border-radius: 6px;
+    padding: 4px 4px 2px 2px;
+    font-size:1.2em;
 }
 
 .ral-section-title {
     font-weight: bold;
-    font-size: 1.2em;
-    padding: 0.2em;
-    margin-right: 32px;
 }
 
 .ral-menu-item {
-    font-size: 1.0em;
-    width: 480px;
-    padding: 0.2em,;
-    margin-right: 32px;
+    font-size:1.0em;
+    padding: 0.2em 4px 0.2em 2px;
 }
 
-.ral-workspace-menu-section {
-    max-height: 640px;
+.ral-app-icon {
+  height: 16px;
+  width: 16px;
 }
 
-.popup-menu-item .ral-action-btn StIcon {
-    icon-size:16px;
+.ral-action-btn {
 }
 
 
